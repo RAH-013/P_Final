@@ -26,6 +26,7 @@
  *     tags:
  *       - Users
  *     summary: Eliminar cuenta propia
+ *     description: Elimina la cuenta del usuario autenticado después de verificar su contraseña.
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -82,26 +83,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Nombre de usuario actualizado correctamente
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     username:
- *                       type: string
- *                       example: nuevo_usuario
- *                     role:
- *                       type: string
- *                       enum: [admin, user]
+ *               $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Nombre de usuario inválido
  *       401:
@@ -154,46 +136,26 @@
  *   delete:
  *     tags:
  *       - Users
- *     summary: Eliminar cualquier cuenta (administrador)
+ *     summary: Eliminar cuenta de otro usuario (administrador)
+ *     description: Permite al administrador eliminar cualquier cuenta excepto la propia.
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Identificador de la cuenta que se desea eliminar
  *         schema:
  *           type: integer
  *           minimum: 1
- *         description: Identificador de la cuenta que se desea eliminar
+ *           example: 15
  *     responses:
  *       200:
  *         description: Cuenta eliminada correctamente
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Cuenta eliminada correctamente
- *                 data:
- *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: Cuenta eliminada correctamente
- *                     user:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 15
- *                         username:
- *                           type: string
- *                           example: usuario_eliminado
+ *               $ref: '#/components/schemas/AdminUserResponse'
  *       400:
  *         description: Identificador inválido o intento de eliminar la propia cuenta
  *       401:
@@ -210,16 +172,18 @@
  *     tags:
  *       - Users
  *     summary: Cambiar rol de una cuenta (administrador)
+ *     description: Permite al administrador cambiar el rol de otro usuario. No se permite modificar el propio rol.
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Identificador de la cuenta cuyo rol se desea cambiar
  *         schema:
  *           type: integer
  *           minimum: 1
- *         description: Identificador de la cuenta cuyo rol se desea cambiar
+ *           example: 15
  *     requestBody:
  *       required: true
  *       content:
@@ -231,9 +195,7 @@
  *             properties:
  *               role:
  *                 type: string
- *                 enum:
- *                   - admin
- *                   - user
+ *                 enum: [admin, user]
  *                 example: admin
  *     responses:
  *       200:
@@ -241,33 +203,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Rol actualizado correctamente
- *                 data:
- *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
- *                       example: Rol actualizado correctamente
- *                     user:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 15
- *                         username:
- *                           type: string
- *                           example: nuevo_usuario
- *                         role:
- *                           type: string
- *                           enum: [admin, user]
- *                           example: admin
+ *               $ref: '#/components/schemas/AdminUserResponse'
  *       400:
  *         description: Rol inválido o intento de cambiar el propio rol
  *       401:
@@ -333,20 +269,69 @@
  *           type: string
  *           example: Información del usuario obtenida correctamente
  *         data:
- *           $ref: '#/components/schemas/UserMeData'
+ *           type: object
+ *           required:
+ *             - token
+ *             - username
+ *           properties:
+ *             token:
+ *               type: string
+ *               description: Token JWT actual de la sesión
+ *               example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *             username:
+ *               type: string
+ *               example: usuario123
  *
- *     UserMeData:
+ *     UserResponse:
  *       type: object
  *       required:
- *         - token
- *         - username
+ *         - success
+ *         - message
+ *         - data
  *       properties:
- *         token:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
  *           type: string
- *           description: Token JWT actual de la sesión
- *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *           example: Nombre de usuario actualizado correctamente
+ *         data:
+ *           $ref: '#/components/schemas/User'
+ *
+ *     AdminUserResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Operación realizada correctamente
+ *         data:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: Operación realizada correctamente
+ *             user:
+ *               $ref: '#/components/schemas/User'
+ *
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 15
  *         username:
  *           type: string
- *           example: usuario123
+ *           example: nuevo_usuario
+ *         role:
+ *           type: string
+ *           enum: [admin, user]
+ *           example: user
  */
 export {};

@@ -3,6 +3,9 @@ import express from "express";
 import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import catalogRoutes from "./routes/catalog.js";
+import genresRoutes from "./routes/genres.js";
+import likesRoutes from "./routes/likes.js";
+import commentsRoutes from "./routes/comments.js";
 
 import { setupSwagger } from "./docs/swagger.js";
 
@@ -18,6 +21,9 @@ setupSwagger(app);
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/catalog", catalogRoutes);
+app.use("/api/genres", genresRoutes);
+app.use("/api/likes", likesRoutes);
+app.use("/api/comments", commentsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -23,6 +23,7 @@
  *               password:
  *                 type: string
  *                 minLength: 8
+ *                 maxLength: 72
  *                 example: Password123!
  *     responses:
  *       201:

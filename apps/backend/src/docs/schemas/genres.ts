@@ -1,0 +1,92 @@
+/**
+ * @openapi
+ * /genres/me:
+ *   get:
+ *     tags:
+ *       - Genres
+ *     summary: Obtener géneros preferidos
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Preferencias obtenidas correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Géneros obtenidos correctamente
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - action
+ *                     - comedy
+ *                     - thriller
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ *
+ *   put:
+ *     tags:
+ *       - Genres
+ *     summary: Actualizar géneros preferidos
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - genres
+ *             properties:
+ *               genres:
+ *                 type: array
+ *                 maxItems: 10
+ *                 items:
+ *                   type: string
+ *                   minLength: 1
+ *                   maxLength: 64
+ *                 example:
+ *                   - action
+ *                   - comedy
+ *                   - thriller
+ *     responses:
+ *       200:
+ *         description: Preferencias actualizadas correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Géneros actualizados correctamente
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - action
+ *                     - comedy
+ *                     - thriller
+ *       400:
+ *         description: Datos inválidos o demasiados géneros
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
+export {};

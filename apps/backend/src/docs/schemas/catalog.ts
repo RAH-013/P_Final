@@ -32,7 +32,7 @@
  *     tags:
  *       - Catalog
  *     summary: Obtener contenido destacado
- *     description: Obtiene 10 películas, 10 series o los 10 títulos mejor calificados entre ambos tipos.
+ *     description: Obtiene hasta 10 películas, 10 series o los 10 títulos mejor calificados entre ambos tipos.
  *     parameters:
  *       - in: query
  *         name: type
@@ -59,7 +59,7 @@
  *     tags:
  *       - Catalog
  *     summary: Obtener detalles de una película o serie
- *     description: Obtiene los metadatos disponibles de un título mediante su identificador único de IMDb. El tipo de contenido se determina automáticamente.
+ *     description: Obtiene los metadatos disponibles de un título mediante su identificador de IMDb y el tipo de contenido indicado.
  *     parameters:
  *       - in: path
  *         name: id
@@ -68,6 +68,13 @@
  *           type: string
  *           pattern: '^tt\d+$'
  *         example: tt0816692
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [movie, series]
+ *         example: movie
  *     responses:
  *       200:
  *         description: Detalles obtenidos correctamente
@@ -76,7 +83,7 @@
  *             schema:
  *               $ref: '#/components/schemas/CatalogItemResponse'
  *       400:
- *         description: Identificador de contenido inválido
+ *         description: Identificador o tipo de contenido inválido
  *       404:
  *         description: Contenido no encontrado
  *       502:
@@ -113,7 +120,7 @@
  *             $ref: '#/components/schemas/SearchSuggestion'
  *         suggestions:
  *           type: array
- *           description: Hasta 20 títulos destacados de películas y series cuando no existen coincidencias por prefijo.
+ *           description: Hasta 20 títulos destacados cuando no existen coincidencias.
  *           maxItems: 20
  *           items:
  *             $ref: '#/components/schemas/SearchFallback'
@@ -124,6 +131,8 @@
  *         - id
  *         - title
  *         - type
+ *         - year
+ *         - country
  *       properties:
  *         id:
  *           type: string
@@ -134,8 +143,15 @@
  *         type:
  *           type: string
  *           enum: [movie, series]
- *           description: Tipo de contenido.
  *           example: movie
+ *         year:
+ *           type: integer
+ *           nullable: true
+ *           example: 2014
+ *         country:
+ *           type: string
+ *           nullable: true
+ *           example: United States
  *
  *     SearchFallback:
  *       type: object
@@ -159,7 +175,6 @@
  *         type:
  *           type: string
  *           enum: [movie, series]
- *           description: Tipo de contenido.
  *           example: movie
  *
  *     CatalogResultResponse:

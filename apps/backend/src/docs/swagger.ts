@@ -30,8 +30,30 @@ const openapiSpec = swaggerJsdoc({
       },
     ],
     tags: [
-      { name: "Auth", description: "Autenticación" },
-      { name: "Users", description: "Gestión de usuarios" },
+      {
+        name: "Auth",
+        description: "Autenticación y gestión de sesiones",
+      },
+      {
+        name: "Users",
+        description: "Gestión de usuarios",
+      },
+      {
+        name: "Genres",
+        description: "Gestión de géneros preferidos",
+      },
+      {
+        name: "Likes",
+        description: "Gestión de películas y series favoritas",
+      },
+      {
+        name: "Comments",
+        description: "Gestión de comentarios",
+      },
+      {
+        name: "Catalog",
+        description: "Búsqueda y consulta de películas y series",
+      },
     ],
     components: {
       securitySchemes: {
@@ -39,6 +61,7 @@ const openapiSpec = swaggerJsdoc({
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
+          description: "Introduce el token JWT obtenido al iniciar sesión.",
         },
       },
     },
