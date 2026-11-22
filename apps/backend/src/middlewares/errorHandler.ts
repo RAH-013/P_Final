@@ -7,20 +7,42 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
     return next(err);
   }
 
+  const error = err as {
+    status?: number;
+    message?: string;
+    stack?: string;
+    type?: string;
+  };
+
+  if (error.type === "entity.parse.failed") {
+    return sendError(
+      res,
+      400,
+      "El cuerpo de la solicitud contiene JSON inválido",
+      [],
+    );
+  }
+
   const status =
-    typeof err.status === "number" && err.status >= 400 && err.status <= 599
-      ? err.status
+    typeof error.status === "number" &&
+    error.status >= 400 &&
+    error.status <= 599
+      ? error.status
       : 500;
 
   const message =
     status === 500
       ? "Error interno del servidor"
-      : err.message || "Error en la solicitud";
+      : error.message || "Error en la solicitud";
 
   const detalles =
-    env.NODE_ENV === "development" && err.stack ? [err.stack] : [];
+    env.NODE_ENV === "development" && status === 500 && error.stack
+      ? [error.stack]
+      : [];
 
-  console.error(err);
+  if (status >= 500) {
+    console.error(err);
+  }
 
-  sendError(res, status, message, detalles);
+  return sendError(res, status, message, detalles);
 };

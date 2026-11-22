@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /auth/register:
+ * /api/auth/register:
  *   post:
  *     tags:
  *       - Auth
@@ -33,7 +33,7 @@
  *       409:
  *         description: Usuario ya registrado
  *
- * /auth/login:
+ * /api/auth/login:
  *   post:
  *     tags:
  *       - Auth

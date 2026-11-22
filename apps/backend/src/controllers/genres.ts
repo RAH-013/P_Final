@@ -20,7 +20,7 @@ export async function updateGenres(req: Request, res: Response) {
   const validation = genresSchema.safeParse(req.body);
 
   if (!validation.success) {
-    return res.status(400).json({
+    return res.status(422).json({
       error: "Los géneros proporcionados no son válidos",
       detalles: validation.error.issues,
     });

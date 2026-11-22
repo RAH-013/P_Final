@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /catalog/search:
+ * /api/catalog/search:
  *   get:
  *     tags:
  *       - Catalog
@@ -27,7 +27,7 @@
  *       502:
  *         description: Error al consultar Cinemeta
  *
- * /catalog/featured:
+ * /api/catalog/featured:
  *   get:
  *     tags:
  *       - Catalog
@@ -54,7 +54,7 @@
  *       502:
  *         description: Error al consultar Cinemeta
  *
- * /catalog/{id}:
+ * /api/catalog/{id}:
  *   get:
  *     tags:
  *       - Catalog

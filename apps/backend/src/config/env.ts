@@ -32,6 +32,8 @@ const envSchema = z
 
     GEMINI_API_KEY: z.string().optional(),
     GEMINI_MODEL: z.string().optional(),
+
+    EXTERNO_URL: z.string().url().optional(),
   })
   .transform((data) => ({
     ...data,

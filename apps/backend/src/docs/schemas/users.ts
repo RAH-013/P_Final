@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /users/me:
+ * /api/users/me:
  *   get:
  *     tags:
  *       - Users
@@ -55,7 +55,7 @@
  *       500:
  *         description: Error interno del servidor
  *
- * /users/me/username:
+ * /api/users/me/username:
  *   patch:
  *     tags:
  *       - Users
@@ -93,7 +93,7 @@
  *       500:
  *         description: Error interno del servidor
  *
- * /users/me/password:
+ * /api/users/me/password:
  *   patch:
  *     tags:
  *       - Users
@@ -132,7 +132,7 @@
  *       500:
  *         description: Error interno del servidor
  *
- * /users/{id}:
+ * /api/users/{id}:
  *   delete:
  *     tags:
  *       - Users
@@ -167,7 +167,7 @@
  *       500:
  *         description: Error interno del servidor
  *
- * /users/{id}/role:
+ * /api/users/{id}/role:
  *   patch:
  *     tags:
  *       - Users

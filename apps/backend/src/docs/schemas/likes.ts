@@ -1,10 +1,11 @@
 /**
  * @openapi
- * /likes:
+ * /api/likes:
  *   get:
  *     tags:
  *       - Likes
- *     summary: Obtener películas y series favoritas
+ *     summary: Obtener los favoritos del usuario autenticado
+ *     description: Devuelve las películas y series que pertenecen al usuario autenticado, ordenadas por fecha de creación descendente.
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -14,24 +15,23 @@
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - likes
  *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Favoritos obtenidos correctamente
- *                 data:
+ *                 likes:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Like'
+ *       400:
+ *         description: El ID del usuario no es válido
  *       401:
- *         description: No autenticado
+ *         description: No autenticado o sesión inválida
  *
  *   post:
  *     tags:
  *       - Likes
- *     summary: Agregar película o serie a favoritos
+ *     summary: Agregar una película o serie a favoritos
+ *     description: Registra un contenido en los favoritos del usuario autenticado. Si ya existe, devuelve el favorito existente.
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -50,40 +50,77 @@
  *                 example: tt0111161
  *               mediaType:
  *                 type: string
- *                 enum: [movie, series]
+ *                 enum:
+ *                   - movie
+ *                   - series
  *                 example: movie
  *     responses:
  *       201:
- *         description: Contenido agregado a favoritos
+ *         description: Favorito creado o favorito existente devuelto correctamente
  *         content:
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - message
+ *                 - like
  *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
  *                 message:
  *                   type: string
- *                   example: Contenido agregado a favoritos
- *                 data:
+ *                   example: Contenido agregado a tus favoritos
+ *                 like:
  *                   $ref: '#/components/schemas/Like'
  *       400:
- *         description: Datos inválidos
+ *         description: Datos del favorito o ID del usuario inválidos
  *       401:
- *         description: No autenticado
+ *         description: No autenticado o sesión inválida
  *       404:
- *         description: Película o serie no encontrada
+ *         description: Usuario o película/serie no encontrada
  *       409:
- *         description: El contenido ya está en favoritos
- *       502:
- *         description: Error al consultar Cinemeta
+ *         description: Conflicto por registro duplicado
  *
- * /likes/{mediaType}/{externalId}:
+ * /api/likes/{id}:
+ *   get:
+ *     tags:
+ *       - Likes
+ *     summary: Obtener un favorito por su ID
+ *     description: Devuelve un favorito únicamente si pertenece al usuario autenticado.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID numérico del favorito
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         example: 5
+ *     responses:
+ *       200:
+ *         description: Favorito obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - like
+ *               properties:
+ *                 like:
+ *                   $ref: '#/components/schemas/Like'
+ *       400:
+ *         description: ID del favorito inválido
+ *       401:
+ *         description: No autenticado o sesión inválida
+ *       404:
+ *         description: Favorito no encontrado o no pertenece al usuario autenticado
+ *
+ * /api/likes/{mediaType}/{externalId}:
  *   delete:
  *     tags:
  *       - Likes
- *     summary: Eliminar contenido de favoritos
+ *     summary: Eliminar un contenido de favoritos
+ *     description: Elimina un favorito perteneciente al usuario autenticado.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -92,7 +129,9 @@
  *         required: true
  *         schema:
  *           type: string
- *           enum: [movie, series]
+ *           enum:
+ *             - movie
+ *             - series
  *         example: movie
  *       - in: path
  *         name: externalId
@@ -103,13 +142,23 @@
  *         example: tt0111161
  *     responses:
  *       200:
- *         description: Contenido eliminado de favoritos
+ *         description: Favorito eliminado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - message
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contenido eliminado de tus favoritos
  *       400:
  *         description: Parámetros inválidos
  *       401:
- *         description: No autenticado
+ *         description: No autenticado o sesión inválida
  *       404:
- *         description: Contenido no encontrado en favoritos
+ *         description: Usuario o contenido no encontrado en favoritos
  *
  * components:
  *   schemas:
@@ -117,30 +166,23 @@
  *       type: object
  *       required:
  *         - id
- *         - userId
  *         - externalId
  *         - mediaType
  *         - createdAt
- *         - updatedAt
  *       properties:
  *         id:
  *           type: integer
  *           example: 5
- *         userId:
- *           type: integer
- *           example: 3
  *         externalId:
  *           type: string
  *           example: tt0111161
  *         mediaType:
  *           type: string
- *           enum: [movie, series]
+ *           enum:
+ *             - movie
+ *             - series
  *           example: movie
  *         createdAt:
- *           type: string
- *           format: date-time
- *           example: "2026-11-21T18:30:00.000Z"
- *         updatedAt:
  *           type: string
  *           format: date-time
  *           example: "2026-11-21T18:30:00.000Z"

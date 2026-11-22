@@ -46,6 +46,57 @@ function validateContent(content: string): string {
   return normalized;
 }
 
+export async function getAllComments() {
+  return Comment.findAll({
+    attributes: [
+      "id",
+      "externalId",
+      "mediaType",
+      "content",
+      "createdAt",
+      "updatedAt",
+    ],
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "username"],
+      },
+    ],
+    order: [["createdAt", "DESC"]],
+  });
+}
+
+export async function getCommentById(commentId: number) {
+  if (!Number.isInteger(commentId) || commentId <= 0) {
+    throw new CommentError("El ID del comentario no es válido", 400);
+  }
+
+  const comment = await Comment.findByPk(commentId, {
+    attributes: [
+      "id",
+      "externalId",
+      "mediaType",
+      "content",
+      "createdAt",
+      "updatedAt",
+    ],
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "username"],
+      },
+    ],
+  });
+
+  if (!comment) {
+    throw new CommentError("Comentario no encontrado", 404);
+  }
+
+  return comment;
+}
+
 export async function getComments(externalId: string, mediaType: string) {
   validateMedia(externalId, mediaType);
 
@@ -80,6 +131,7 @@ export async function createComment(
   content: string,
 ) {
   validateMedia(externalId, mediaType);
+
   const normalizedContent = validateContent(content);
 
   const metadata = await getCatalogMetadata(externalId, mediaType);

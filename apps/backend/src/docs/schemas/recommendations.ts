@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /recommendations:
+ * /api/recommendations:
  *   get:
  *     tags:
  *       - Recommendations
@@ -33,7 +33,7 @@
  *       404:
  *         description: Usuario no encontrado
  *
- * /recommendations/next:
+ * /api/recommendations/next:
  *   get:
  *     tags:
  *       - Recommendations
@@ -66,7 +66,7 @@
  *       503:
  *         description: No fue posible generar una recomendación
  *
- * /recommendations/{id}:
+ * /api/recommendations/{id}:
  *   get:
  *     tags:
  *       - Recommendations

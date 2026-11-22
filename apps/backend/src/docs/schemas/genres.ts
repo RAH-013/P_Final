@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /genres/me:
+ * /api/genres/me:
  *   get:
  *     tags:
  *       - Genres
@@ -82,11 +82,31 @@
  *                     - action
  *                     - comedy
  *                     - thriller
- *       400:
- *         description: Datos inválidos o demasiados géneros
  *       401:
  *         description: No autenticado
  *       404:
  *         description: Usuario no encontrado
+ *       422:
+ *         description: Los géneros proporcionados no cumplen con las reglas de validación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - error
+ *                 - detalles
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Los géneros proporcionados no son válidos
+ *                 detalles:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                   example:
+ *                     - code: too_big
+ *                       message: Array must contain at most 10 element(s)
+ *                       path:
+ *                         - genres
  */
 export {};

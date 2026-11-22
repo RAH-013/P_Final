@@ -7,6 +7,7 @@ import genresRoutes from "./routes/genres.js";
 import likesRoutes from "./routes/likes.js";
 import commentsRoutes from "./routes/comments.js";
 import recommendationsRoutes from "./routes/recommendations.js";
+import externalRoutes from "./routes/external.js";
 
 import { setupSwagger } from "./docs/swagger.js";
 
@@ -26,6 +27,7 @@ app.use("/api/genres", genresRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/recommendations", recommendationsRoutes);
+app.use("/api/test-externo", externalRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
