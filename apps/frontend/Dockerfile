@@ -1,17 +1,31 @@
-FROM node:24-alpine AS builder
+
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && pnpm install --frozen-lockfile
+COPY package*.json ./
+
+RUN npm ci
 
 COPY . .
-RUN pnpm build
 
-FROM nginx:alpine AS production
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+RUN npm run build
 
-EXPOSE 80
+FROM node:24-alpine AS runtime
 
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN npm install --global serve
+
+COPY --from=build --chown=node:node /app/dist ./dist
+
+USER node
+
+EXPOSE 8080
+
+CMD ["serve", "-s", "dist", "-l", "8080"]

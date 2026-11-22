@@ -219,6 +219,26 @@ export async function getCurrentUser(userId: number | string) {
   const user = await getUser(userId);
 
   return {
+    id: user.id,
     username: user.username,
+    role: user.role,
+  };
+}
+
+export async function getAllUsers(adminId: number | string) {
+  await verifyAdmin(adminId);
+
+  const users = await User.findAll({
+    attributes: ["id", "username", "role"],
+    order: [["id", "ASC"]],
+  });
+
+  return {
+    users: users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      role: user.role,
+    })),
+    total: users.length,
   };
 }

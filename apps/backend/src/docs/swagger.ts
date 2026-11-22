@@ -22,8 +22,6 @@ const openapiSpec = swaggerJsdoc({
       title: "Nexus API REST",
       version: "1.0.0",
       description: `
-# Nexus API REST
-
 ## Descripción general
 
 Nexus API es el servicio backend de **Nexus**, una plataforma orientada al descubrimiento, exploración y gestión personalizada de películas y series.

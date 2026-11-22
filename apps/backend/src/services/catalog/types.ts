@@ -47,8 +47,7 @@ export interface SearchSuggestion {
   id: string;
   title: string;
   type: MediaType;
-  year: number | null;
-  country: string | null;
+  poster: string | null;
 }
 
 export interface SearchFallback {

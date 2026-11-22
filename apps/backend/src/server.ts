@@ -10,6 +10,8 @@ const debug = debugFactory("backend:server");
 app.use(
   cors({
     origin: env.CORS_ORIGINS.includes("*") ? "*" : env.CORS_ORIGINS,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 

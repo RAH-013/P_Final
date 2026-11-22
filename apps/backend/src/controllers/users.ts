@@ -7,6 +7,7 @@ import {
   adminDeleteAccount,
   changeUserRole,
   getCurrentUser,
+  getAllUsers,
 } from "../services/users.js";
 
 import { sendSuccess } from "../utils/response.js";
@@ -84,7 +85,7 @@ export async function getMe(
 
     sendSuccess(res, 200, "Información del usuario obtenida correctamente", {
       token,
-      username: result.username,
+      profile: result,
     });
   } catch (error) {
     next(error);
@@ -118,6 +119,20 @@ export async function changeRole(
     );
 
     sendSuccess(res, 200, "Rol actualizado correctamente", result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getUsers(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const result = await getAllUsers(req.user!.sub);
+
+    sendSuccess(res, 200, "Usuarios obtenidos correctamente", result);
   } catch (error) {
     next(error);
   }

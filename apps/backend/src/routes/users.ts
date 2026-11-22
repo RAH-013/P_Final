@@ -1,7 +1,5 @@
 import { Router } from "express";
-
 import { requireAuth, requireRole } from "../middlewares/auth.js";
-
 import {
   changeUsername,
   changePassword,
@@ -9,9 +7,12 @@ import {
   adminRemoveAccount,
   changeRole,
   getMe,
+  getUsers,
 } from "../controllers/users.js";
 
 const router = Router();
+
+router.get("/", requireAuth, requireRole("admin"), getUsers);
 
 router.patch("/me/username", requireAuth, changeUsername);
 router.patch("/me/password", requireAuth, changePassword);

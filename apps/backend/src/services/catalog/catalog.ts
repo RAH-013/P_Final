@@ -11,11 +11,15 @@ import type {
 } from "./types.js";
 
 const SEARCH_FALLBACK_LIMIT = 20;
-const FEATURED_LIMIT = 10;
+const FEATURED_LIMIT = 12;
 
 function normalize(meta: CinemetaMeta): CatalogItem {
   const rating = Number(meta.imdbRating);
   const votes = Number(meta.imdbVotes?.replace(/,/g, ""));
+  const yearValue =
+    meta.year == null ? "" : String(meta.year).replace(/-/g, "");
+  const parsedYear = Number(yearValue);
+  const year = yearValue && Number.isFinite(parsedYear) ? parsedYear : null;
 
   return {
     id: meta.id,
@@ -25,7 +29,7 @@ function normalize(meta: CinemetaMeta): CatalogItem {
     poster: meta.poster ?? null,
     background: meta.background ?? null,
     releaseDate: meta.released ?? null,
-    year: meta.year ?? null,
+    year,
     runtime: meta.runtime ?? null,
     genres: meta.genres ?? [],
     rating: Number.isFinite(rating) ? rating : null,
@@ -50,8 +54,7 @@ function toSuggestion(meta: CinemetaMeta): SearchSuggestion {
     id: meta.id,
     title: meta.name,
     type: meta.type,
-    year: meta.year ?? null,
-    country: meta.country ?? null,
+    poster: meta.poster ?? null,
   };
 }
 

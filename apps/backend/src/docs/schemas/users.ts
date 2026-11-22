@@ -1,5 +1,27 @@
 /**
  * @openapi
+ * /api/users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener todos los usuarios (administrador)
+ *     description: Devuelve la lista de usuarios registrados, sin incluir información sensible como las contraseñas.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Usuarios obtenidos correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UsersListResponse'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: Se requieren permisos de administrador
+ *       500:
+ *         description: Error interno del servidor
+ *
  * /api/users/me:
  *   get:
  *     tags:
@@ -254,6 +276,34 @@
  *           items:
  *             type: string
  *           example: []
+ *
+ *     UsersListResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Usuarios obtenidos correctamente
+ *         data:
+ *           type: object
+ *           required:
+ *             - users
+ *             - total
+ *           properties:
+ *             users:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *             total:
+ *               type: integer
+ *               minimum: 0
+ *               example: 25
  *
  *     UserMeResponse:
  *       type: object
