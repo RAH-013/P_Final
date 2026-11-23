@@ -196,10 +196,12 @@ Nexus utiliza REST para exponer sus funcionalidades, ya que permite integrar fá
 
 ## Equipo y reflexiones
 
-| Integrante              | Qué hizo                                        |
-| ----------------------- | ----------------------------------------------- |
-| [Nombre del integrante] | [Responsabilidades y componentes desarrollados] |
-| [Nombre del integrante] | [Responsabilidades y componentes desarrollados] |
-| [Nombre del integrante] | [Responsabilidades y componentes desarrollados] |
+| Integrante                        | Qué hizo                                        |
+| --------------------------------- | ----------------------------------------------- |
+| Anguiano Hernández Ricardo        | Desarrollador Full-Stack                        |
+| Aviña Martinez Luis Fernando      | [Responsabilidades y componentes desarrollados] |
+| Fajardo Williams Romina Elizabeth | [Responsabilidades y componentes desarrollados] |
 
-**[Tu nombre]:** La parte que más me costó fue [completar con la dificultad técnica real], principalmente porque [explicar el problema y cómo se resolvió]. Si el proyecto se desarrollara en una empresa, mejoraría [pruebas, monitoreo, documentación, seguridad, despliegue u otro aspecto], buscando facilitar su mantenimiento, escalabilidad y evolución.
+**Ricardo**: La parte que más me costó fue integrar los diferentes servicios del proyecto y conseguir que funcionaran correctamente en conjunto, principalmente porque cada componente tiene sus propias configuraciones, dependencias y formas de comunicación. Tuve que resolver problemas relacionados con la autenticación, la persistencia de datos, las respuestas de servicios externos y la configuración de Docker Compose. Esto me permitió comprender mejor cómo se relacionan las distintas capas de una aplicación y la importancia de manejar adecuadamente los errores.
+
+Si el proyecto se desarrollara en una empresa, mejoraría principalmente la cobertura de pruebas automatizadas, el monitoreo de los servicios y la gestión de errores. También reforzaría la seguridad de las integraciones externas y establecería procesos de despliegue más controlados. Esto facilitaría el mantenimiento del sistema, permitiría detectar problemas antes de llegar a producción y prepararía la plataforma para crecer sin comprometer su estabilidad.
