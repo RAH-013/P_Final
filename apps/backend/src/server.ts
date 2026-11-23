@@ -1,27 +1,11 @@
 import http from "node:http";
 import debugFactory from "debug";
-import cors from "cors";
+
 import app from "./app.js";
 import { connectDB } from "./config/db/index.js";
 import { env } from "./config/env.js";
 
 const debug = debugFactory("backend:server");
-
-app.use(
-  cors({
-    origin: env.CORS_ORIGINS.includes("*") ? "*" : env.CORS_ORIGINS,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
-
-console.log(
-  `CORS: ${
-    env.CORS_ORIGINS.includes("*")
-      ? "Todos los dominios permitidos (*)"
-      : env.CORS_ORIGINS.join(", ")
-  }`,
-);
 
 await connectDB();
 

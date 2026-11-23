@@ -12,6 +12,26 @@ export class CommentError extends Error {
   }
 }
 
+const COMMENT_ATTRIBUTES = [
+  "id",
+  "userId",
+  "externalId",
+  "mediaType",
+  "content",
+  "createdAt",
+  "updatedAt",
+] as const;
+
+const USER_ATTRIBUTES = ["id", "username"] as const;
+
+const COMMENT_INCLUDE = [
+  {
+    model: User,
+    as: "user",
+    attributes: [...USER_ATTRIBUTES],
+  },
+];
+
 function validateMedia(
   externalId: string,
   mediaType: string,
@@ -48,21 +68,8 @@ function validateContent(content: string): string {
 
 export async function getAllComments() {
   return Comment.findAll({
-    attributes: [
-      "id",
-      "externalId",
-      "mediaType",
-      "content",
-      "createdAt",
-      "updatedAt",
-    ],
-    include: [
-      {
-        model: User,
-        as: "user",
-        attributes: ["id", "username"],
-      },
-    ],
+    attributes: [...COMMENT_ATTRIBUTES],
+    include: COMMENT_INCLUDE,
     order: [["createdAt", "DESC"]],
   });
 }
@@ -73,21 +80,8 @@ export async function getCommentById(commentId: number) {
   }
 
   const comment = await Comment.findByPk(commentId, {
-    attributes: [
-      "id",
-      "externalId",
-      "mediaType",
-      "content",
-      "createdAt",
-      "updatedAt",
-    ],
-    include: [
-      {
-        model: User,
-        as: "user",
-        attributes: ["id", "username"],
-      },
-    ],
+    attributes: [...COMMENT_ATTRIBUTES],
+    include: COMMENT_INCLUDE,
   });
 
   if (!comment) {
@@ -105,21 +99,27 @@ export async function getComments(externalId: string, mediaType: string) {
       externalId,
       mediaType,
     },
-    attributes: [
-      "id",
-      "externalId",
-      "mediaType",
-      "content",
-      "createdAt",
-      "updatedAt",
-    ],
-    include: [
-      {
-        model: User,
-        as: "user",
-        attributes: ["id", "username"],
-      },
-    ],
+    attributes: [...COMMENT_ATTRIBUTES],
+    include: COMMENT_INCLUDE,
+    order: [["createdAt", "DESC"]],
+  });
+}
+
+export async function getCommentsByUser(userId: number) {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new CommentError("El ID del usuario no es válido", 400);
+  }
+
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw new CommentError("Usuario no encontrado", 404);
+  }
+
+  return Comment.findAll({
+    where: { userId },
+    attributes: [...COMMENT_ATTRIBUTES],
+    include: COMMENT_INCLUDE,
     order: [["createdAt", "DESC"]],
   });
 }
@@ -146,12 +146,14 @@ export async function createComment(
     throw new CommentError("Usuario no encontrado", 404);
   }
 
-  return Comment.create({
+  const comment = await Comment.create({
     userId,
     externalId,
     mediaType,
     content: normalizedContent,
   });
+
+  return getCommentById(comment.id);
 }
 
 export async function updateComment(
@@ -182,7 +184,7 @@ export async function updateComment(
 
   await comment.save();
 
-  return comment;
+  return getCommentById(commentId);
 }
 
 export async function deleteComment(

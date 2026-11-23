@@ -6,12 +6,14 @@ import {
   getAllComments,
   getCommentById,
   getComments,
+  getCommentsByUser,
   updateComment,
 } from "../controllers/comments.js";
 
 const router = Router();
 
 router.get("/", getAllComments);
+router.get("/user/:userId", getCommentsByUser);
 router.get("/:mediaType/:externalId", getComments);
 router.get("/:id", getCommentById);
 

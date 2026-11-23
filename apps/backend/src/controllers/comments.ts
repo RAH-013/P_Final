@@ -1,13 +1,17 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
+
 import {
   createComment as createCommentService,
   deleteComment as deleteCommentService,
   getAllComments as getAllCommentsService,
   getCommentById as getCommentByIdService,
+  getCommentsByUser as getCommentsByUserService,
   getComments as getCommentsService,
   updateComment as updateCommentService,
 } from "../services/comments.js";
+
+import { sendSuccess } from "../utils/response.js";
 
 const mediaSchema = z.object({
   externalId: z.string().regex(/^tt\d+$/),
@@ -26,19 +30,23 @@ const commentIdSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
+const userIdSchema = z.object({
+  userId: z.coerce.number().int().positive(),
+});
+
 export async function getAllComments(
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction,
-) {
+): Promise<void> {
   try {
     const comments = await getAllCommentsService();
 
-    return res.json({
+    sendSuccess(res, 200, "Comentarios obtenidos correctamente", {
       comments,
     });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -46,24 +54,27 @@ export async function getCommentById(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = commentIdSchema.safeParse(req.params);
+): Promise<void> {
+  const validation = commentIdSchema.safeParse(req.params);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "El ID del comentario no es válido",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("El ID del comentario no es válido"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const comment = await getCommentByIdService(validation.data.id);
 
-    return res.json({
+    sendSuccess(res, 200, "Comentario obtenido correctamente", {
       comment,
     });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -71,30 +82,61 @@ export async function getComments(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = mediaSchema.safeParse({
-      externalId: req.params.externalId,
-      mediaType: req.params.mediaType,
-    });
+): Promise<void> {
+  const validation = mediaSchema.safeParse({
+    externalId: req.params.externalId,
+    mediaType: req.params.mediaType,
+  });
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "Los datos del contenido no son válidos",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("Los datos del contenido no son válidos"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const comments = await getCommentsService(
       validation.data.externalId,
       validation.data.mediaType,
     );
 
-    return res.json({
+    sendSuccess(res, 200, "Comentarios obtenidos correctamente", {
       comments,
     });
   } catch (error) {
-    return next(error);
+    next(error);
+  }
+}
+
+export async function getCommentsByUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const validation = userIdSchema.safeParse(req.params);
+
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("El ID del usuario no es válido"), {
+        status: 400,
+        detalles: validation.error.issues,
+      }),
+    );
+    return;
+  }
+
+  try {
+    const comments = await getCommentsByUserService(validation.data.userId);
+
+    sendSuccess(res, 200, "Comentarios del usuario obtenidos correctamente", {
+      comments,
+    });
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -102,17 +144,20 @@ export async function createComment(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = createCommentSchema.safeParse(req.body);
+): Promise<void> {
+  const validation = createCommentSchema.safeParse(req.body);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "Los datos del comentario no son válidos",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("Los datos del comentario no son válidos"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
 
     const comment = await createCommentService(
@@ -122,13 +167,12 @@ export async function createComment(
       validation.data.content,
     );
 
-    return res.status(201).json({
+    sendSuccess(res, 201, "Comentario publicado", {
       id: comment.id,
-      message: "Comentario publicado",
       comment,
     });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -136,21 +180,24 @@ export async function updateComment(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const idValidation = commentIdSchema.safeParse(req.params);
-    const bodyValidation = updateCommentSchema.safeParse(req.body);
+): Promise<void> {
+  const idValidation = commentIdSchema.safeParse(req.params);
+  const bodyValidation = updateCommentSchema.safeParse(req.body);
 
-    if (!idValidation.success || !bodyValidation.success) {
-      return res.status(400).json({
-        error: "Los datos del comentario no son válidos",
+  if (!idValidation.success || !bodyValidation.success) {
+    next(
+      Object.assign(new Error("Los datos del comentario no son válidos"), {
+        status: 400,
         detalles: [
           ...(idValidation.success ? [] : idValidation.error.issues),
           ...(bodyValidation.success ? [] : bodyValidation.error.issues),
         ],
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
 
     const comment = await updateCommentService(
@@ -159,12 +206,11 @@ export async function updateComment(
       bodyValidation.data.content,
     );
 
-    return res.json({
-      message: "Comentario actualizado",
+    sendSuccess(res, 200, "Comentario actualizado", {
       comment,
     });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -172,24 +218,27 @@ export async function deleteComment(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = commentIdSchema.safeParse(req.params);
+): Promise<void> {
+  const validation = commentIdSchema.safeParse(req.params);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "El ID del comentario no es válido",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("El ID del comentario no es válido"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
     const role = req.user!.role;
 
     const result = await deleteCommentService(validation.data.id, userId, role);
 
-    return res.json(result);
+    sendSuccess(res, 200, result.message, result);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }

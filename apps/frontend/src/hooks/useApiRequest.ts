@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import axios from "axios";
 
 function getErrorMessage(error: unknown): string {
@@ -24,26 +24,44 @@ export function useApiRequest<TArgs extends unknown[], TResult>(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const requestId = useRef(0);
+
   const execute = useCallback(
     async (...args: TArgs): Promise<TResult> => {
-      setLoading(true);
-      setError(null);
+      const currentRequest = ++requestId.current;
+
+      await Promise.resolve();
+
+      if (currentRequest === requestId.current) {
+        setLoading(true);
+        setError(null);
+      }
 
       try {
         const result = await request(...args);
-        setData(result);
+
+        if (currentRequest === requestId.current) {
+          setData(result);
+        }
+
         return result;
       } catch (err) {
-        setError(getErrorMessage(err));
+        if (currentRequest === requestId.current) {
+          setError(getErrorMessage(err));
+        }
+
         throw err;
       } finally {
-        setLoading(false);
+        if (currentRequest === requestId.current) {
+          setLoading(false);
+        }
       }
     },
     [request],
   );
 
   const reset = useCallback(() => {
+    requestId.current += 1;
     setData(null);
     setError(null);
     setLoading(false);

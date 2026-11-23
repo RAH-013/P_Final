@@ -4,6 +4,7 @@ import {
   getRecommendationById,
 } from "../api/services/recommendations";
 
+import type { RecommendationType } from "../api/services/recommendations";
 import { useApiRequest } from "./useApiRequest";
 
 export function useRecommendations() {
@@ -15,8 +16,8 @@ export function useRecommendations() {
     return previousRequest.execute();
   };
 
-  const fetchNext = async () => {
-    return nextRequest.execute();
+  const fetchNext = async (type: RecommendationType = "all") => {
+    return nextRequest.execute(type);
   };
 
   const fetchById = async (id: number) => {

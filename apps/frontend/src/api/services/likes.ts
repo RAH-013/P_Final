@@ -1,5 +1,5 @@
 import api from "../axios";
-import type { Like, MediaType, MessageResponse } from "../types";
+import type { ApiResponse, Like, MediaType, MessageResponse } from "../types";
 
 export interface CreateLikePayload {
   externalId: string;
@@ -19,30 +19,31 @@ export interface CreateLikeResponse extends MessageResponse {
 }
 
 export async function getLikes(): Promise<LikesResponse> {
-  const { data } = await api.get<LikesResponse>("/likes");
-  return data;
+  const { data } = await api.get<ApiResponse<LikesResponse>>("/likes");
+  return data.data;
 }
 
 export async function createLike(
   payload: CreateLikePayload,
 ): Promise<CreateLikeResponse> {
-  const { data } = await api.post<CreateLikeResponse>("/likes", payload);
-
-  return data;
+  const { data } = await api.post<ApiResponse<CreateLikeResponse>>(
+    "/likes",
+    payload,
+  );
+  return data.data;
 }
 
 export async function getLikeById(id: number): Promise<LikeResponse> {
-  const { data } = await api.get<LikeResponse>(`/likes/${id}`);
-  return data;
+  const { data } = await api.get<ApiResponse<LikeResponse>>(`/likes/${id}`);
+  return data.data;
 }
 
 export async function deleteLike(
   mediaType: MediaType,
   externalId: string,
 ): Promise<MessageResponse> {
-  const { data } = await api.delete<MessageResponse>(
+  const { data } = await api.delete<ApiResponse<MessageResponse>>(
     `/likes/${mediaType}/${encodeURIComponent(externalId)}`,
   );
-
-  return data;
+  return data.data;
 }

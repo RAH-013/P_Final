@@ -10,8 +10,8 @@ import type {
   SearchSuggestion,
 } from "./types.js";
 
-const SEARCH_FALLBACK_LIMIT = 20;
-const FEATURED_LIMIT = 12;
+const SEARCH_FALLBACK_LIMIT = 10;
+const FEATURED_LIMIT = 20;
 
 function normalize(meta: CinemetaMeta): CatalogItem {
   const rating = Number(meta.imdbRating);
@@ -105,16 +105,7 @@ export async function searchCatalog(
       title: normalizeTitle(meta.name),
     }))
     .filter(({ title }) => title.startsWith(normalizedQuery))
-    .sort((a, b) => {
-      const startsA = a.title.startsWith(normalizedQuery);
-      const startsB = b.title.startsWith(normalizedQuery);
-
-      if (startsA !== startsB) {
-        return startsA ? -1 : 1;
-      }
-
-      return a.title.length - b.title.length;
-    })
+    .sort((a, b) => a.title.length - b.title.length)
     .map(({ meta }) => meta)
     .map(toSuggestion);
 

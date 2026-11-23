@@ -1,11 +1,14 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
+
 import {
   addLike,
   getUserLike,
   getUserLikes,
   removeLike,
 } from "../services/likes.js";
+
+import { sendSuccess } from "../utils/response.js";
 
 const likeSchema = z.object({
   externalId: z.string().regex(/^tt\d+$/),
@@ -18,14 +21,14 @@ export async function getLikes(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
+): Promise<void> {
   try {
     const userId = Number(req.user!.sub);
     const likes = await getUserLikes(userId);
 
-    return res.json({ likes });
+    sendSuccess(res, 200, "Favoritos obtenidos correctamente", { likes });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -33,23 +36,26 @@ export async function getLikeById(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = likeIdSchema.safeParse(req.params.id);
+): Promise<void> {
+  const validation = likeIdSchema.safeParse(req.params.id);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "El ID del favorito no es válido",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("El ID del favorito no es válido"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
     const like = await getUserLike(userId, Number(validation.data));
 
-    return res.json({ like });
+    sendSuccess(res, 200, "Favorito obtenido correctamente", { like });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -57,17 +63,20 @@ export async function createLike(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = likeSchema.safeParse(req.body);
+): Promise<void> {
+  const validation = likeSchema.safeParse(req.body);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "Los datos del favorito no son válidos",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("Los datos del favorito no son válidos"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
 
     const like = await addLike(
@@ -76,12 +85,9 @@ export async function createLike(
       validation.data.mediaType,
     );
 
-    return res.status(201).json({
-      message: "Contenido agregado a tus favoritos",
-      like,
-    });
+    sendSuccess(res, 201, "Contenido agregado a tus favoritos", { like });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }
 
@@ -89,20 +95,23 @@ export async function deleteLike(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  try {
-    const validation = likeSchema.safeParse({
-      externalId: req.params.externalId,
-      mediaType: req.params.mediaType,
-    });
+): Promise<void> {
+  const validation = likeSchema.safeParse({
+    externalId: req.params.externalId,
+    mediaType: req.params.mediaType,
+  });
 
-    if (!validation.success) {
-      return res.status(400).json({
-        error: "Los datos del favorito no son válidos",
+  if (!validation.success) {
+    next(
+      Object.assign(new Error("Los datos del favorito no son válidos"), {
+        status: 400,
         detalles: validation.error.issues,
-      });
-    }
+      }),
+    );
+    return;
+  }
 
+  try {
     const userId = Number(req.user!.sub);
 
     const result = await removeLike(
@@ -111,8 +120,8 @@ export async function deleteLike(
       validation.data.mediaType,
     );
 
-    return res.json(result);
+    sendSuccess(res, 200, result.message, result);
   } catch (error) {
-    return next(error);
+    next(error);
   }
 }

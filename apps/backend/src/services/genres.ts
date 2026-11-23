@@ -1,7 +1,7 @@
-import { Op } from "sequelize";
 import { sequelize } from "../config/db/connection.js";
 import User from "../models/User.js";
 import UserGenre from "../models/UserGenre.js";
+import { getGenres } from "./catalog/cinemeta.js";
 
 export class GenreError extends Error {
   constructor(
@@ -11,6 +11,11 @@ export class GenreError extends Error {
     super(message);
     this.name = "GenreError";
   }
+}
+
+interface UpdateGenresResult {
+  genres: string[];
+  updated: boolean;
 }
 
 function normalizeGenres(genres: string[]): string[] {
@@ -26,10 +31,14 @@ function normalizeGenres(genres: string[]): string[] {
     throw new GenreError("Uno o más géneros no son válidos", 400);
   }
 
-  return [...new Set(normalized.map((genre) => genre.toLowerCase()))];
+  return [
+    ...new Map(
+      normalized.map((genre) => [genre.toLocaleLowerCase(), genre]),
+    ).values(),
+  ];
 }
 
-export async function getUserGenres(userId: number) {
+export async function getUserGenres(userId: number): Promise<string[]> {
   const genres = await UserGenre.findAll({
     where: { userId },
     attributes: ["genre"],
@@ -39,7 +48,10 @@ export async function getUserGenres(userId: number) {
   return genres.map(({ genre }) => genre);
 }
 
-export async function updateUserGenres(userId: number, genres: string[]) {
+export async function updateUserGenres(
+  userId: number,
+  genres: string[],
+): Promise<UpdateGenresResult> {
   const normalizedGenres = normalizeGenres(genres);
 
   if (normalizedGenres.length > 10) {
@@ -63,10 +75,12 @@ export async function updateUserGenres(userId: number, genres: string[]) {
     });
 
     const current = currentGenres
-      .map(({ genre }) => genre.toLowerCase())
+      .map(({ genre }) => genre.toLocaleLowerCase())
       .sort();
 
-    const next = [...normalizedGenres].sort();
+    const next = normalizedGenres
+      .map((genre) => genre.toLocaleLowerCase())
+      .sort();
 
     const hasChanged =
       current.length !== next.length ||
@@ -104,4 +118,8 @@ export async function updateUserGenres(userId: number, genres: string[]) {
       updated: true,
     };
   });
+}
+
+export function getAvailableGenres(): Promise<string[]> {
+  return getGenres();
 }

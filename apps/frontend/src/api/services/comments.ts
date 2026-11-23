@@ -1,5 +1,10 @@
 import api from "../axios";
-import type { Comment, MediaType, MessageResponse } from "../types";
+import type {
+  ApiResponse,
+  Comment,
+  MediaType,
+  MessageResponse,
+} from "../types";
 
 export interface CreateCommentPayload {
   externalId: string;
@@ -21,57 +26,75 @@ export interface CommentResponse {
 
 export interface CreateCommentResponse {
   id: number;
-  message: string;
   comment: Comment;
 }
 
-export interface UpdateCommentResponse extends MessageResponse {
+export interface UpdateCommentResponse {
   comment: Comment;
 }
 
 export async function getAllComments(): Promise<CommentsResponse> {
-  const { data } = await api.get<CommentsResponse>("/comments");
-  return data;
+  const { data } = await api.get<ApiResponse<CommentsResponse>>("/comments");
+
+  return data.data;
 }
 
-export async function createComment(
-  payload: CreateCommentPayload,
-): Promise<CreateCommentResponse> {
-  const { data } = await api.post<CreateCommentResponse>("/comments", payload);
+export async function getCommentsByUser(
+  userId: number,
+): Promise<CommentsResponse> {
+  const { data } = await api.get<ApiResponse<CommentsResponse>>(
+    `/comments/user/${userId}`,
+  );
 
-  return data;
+  return data.data;
 }
 
 export async function getCommentsByMedia(
   mediaType: MediaType,
   externalId: string,
 ): Promise<CommentsResponse> {
-  const { data } = await api.get<CommentsResponse>(
+  const { data } = await api.get<ApiResponse<CommentsResponse>>(
     `/comments/${mediaType}/${encodeURIComponent(externalId)}`,
   );
 
-  return data;
+  return data.data;
 }
 
 export async function getCommentById(id: number): Promise<CommentResponse> {
-  const { data } = await api.get<CommentResponse>(`/comments/${id}`);
-  return data;
+  const { data } = await api.get<ApiResponse<CommentResponse>>(
+    `/comments/${id}`,
+  );
+
+  return data.data;
+}
+
+export async function createComment(
+  payload: CreateCommentPayload,
+): Promise<CreateCommentResponse> {
+  const { data } = await api.post<ApiResponse<CreateCommentResponse>>(
+    "/comments",
+    payload,
+  );
+
+  return data.data;
 }
 
 export async function updateComment(
   id: number,
   payload: UpdateCommentPayload,
 ): Promise<UpdateCommentResponse> {
-  const { data } = await api.patch<UpdateCommentResponse>(
+  const { data } = await api.patch<ApiResponse<UpdateCommentResponse>>(
     `/comments/${id}`,
     payload,
   );
 
-  return data;
+  return data.data;
 }
 
 export async function deleteComment(id: number): Promise<MessageResponse> {
-  const { data } = await api.delete<MessageResponse>(`/comments/${id}`);
+  const { data } = await api.delete<ApiResponse<MessageResponse>>(
+    `/comments/${id}`,
+  );
 
-  return data;
+  return data.data;
 }

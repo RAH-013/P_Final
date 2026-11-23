@@ -3,7 +3,7 @@ import star from "../assets/star.svg";
 function Loader() {
   return (
     <div
-      className="flex h-full min-h-0 w-full flex-1 items-center justify-center gap-3"
+      className="flex min-h-99 w-full items-center justify-center gap-3"
       role="status"
       aria-label="Cargando"
     >

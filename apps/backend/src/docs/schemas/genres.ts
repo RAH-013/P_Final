@@ -1,5 +1,36 @@
 /**
  * @openapi
+ * /api/genres:
+ *   get:
+ *     tags:
+ *       - Genres
+ *     summary: Obtener géneros disponibles
+ *     description: Obtiene los géneros presentes en los catálogos de películas y series de Cinemeta.
+ *     responses:
+ *       200:
+ *         description: Géneros disponibles obtenidos correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 genres:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - Action
+ *                     - Adventure
+ *                     - Comedy
+ *                     - Crime
+ *                     - Drama
+ *                     - Thriller
+ *                 total:
+ *                   type: integer
+ *                   example: 6
+ *       502:
+ *         description: Error al consultar Cinemeta
+ *
  * /api/genres/me:
  *   get:
  *     tags:

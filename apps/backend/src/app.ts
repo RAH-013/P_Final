@@ -29,6 +29,13 @@ app.use("/api/comments", commentsRoutes);
 app.use("/api/recommendations", recommendationsRoutes);
 app.use("/api/test-externo", externalRoutes);
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "backend",
+  });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 

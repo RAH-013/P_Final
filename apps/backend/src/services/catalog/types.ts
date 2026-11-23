@@ -24,6 +24,16 @@ export interface CinemetaResponse {
   metas?: CinemetaMeta[];
 }
 
+export interface CinemetaManifest {
+  catalogs?: CinemetaManifestCatalog[];
+}
+
+export interface CinemetaManifestCatalog {
+  id: string;
+  type: MediaType;
+  genres?: string[];
+}
+
 export interface CatalogItem {
   id: string;
   type: MediaType;

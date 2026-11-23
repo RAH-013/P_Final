@@ -1,37 +1,75 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { getUserGenres, updateUserGenres } from "../services/genres.js";
+
+import {
+  getAvailableGenres,
+  getUserGenres,
+  updateUserGenres,
+} from "../services/genres.js";
+
+import { sendSuccess } from "../utils/response.js";
 
 const genresSchema = z.object({
   genres: z.array(z.string().trim().min(1).max(64)).max(10),
 });
 
-export async function getGenres(req: Request, res: Response) {
-  const userId = Number(req.user!.sub);
+export async function getAvailableGenresController(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const genres = await getAvailableGenres();
 
-  const genres = await getUserGenres(userId);
-
-  return res.json({
-    genres,
-  });
+    sendSuccess(res, 200, "Géneros disponibles obtenidos correctamente", {
+      genres,
+      total: genres.length,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function updateGenres(req: Request, res: Response) {
+export async function getGenres(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const userId = Number(req.user!.sub);
+    const genres = await getUserGenres(userId);
+
+    sendSuccess(res, 200, "Preferencias obtenidas correctamente", {
+      genres,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateGenres(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   const validation = genresSchema.safeParse(req.body);
 
   if (!validation.success) {
-    return res.status(422).json({
-      error: "Los géneros proporcionados no son válidos",
-      detalles: validation.error.issues,
-    });
+    next(
+      Object.assign(new Error("Los géneros proporcionados no son válidos"), {
+        status: 422,
+        detalles: validation.error.issues,
+      }),
+    );
+    return;
   }
 
-  const userId = Number(req.user!.sub);
+  try {
+    const userId = Number(req.user!.sub);
+    const result = await updateUserGenres(userId, validation.data.genres);
 
-  const result = await updateUserGenres(userId, validation.data.genres);
-
-  return res.json({
-    message: "Preferencias actualizadas",
-    ...result,
-  });
+    sendSuccess(res, 200, "Preferencias actualizadas", result);
+  } catch (error) {
+    next(error);
+  }
 }

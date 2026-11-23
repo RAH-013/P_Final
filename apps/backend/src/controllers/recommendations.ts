@@ -1,9 +1,15 @@
 import type { RequestHandler } from "express";
+
 import {
   getRecommendations as getRecommendationsService,
   getNextRecommendation as getNextRecommendationService,
   getRecommendationById as getRecommendationByIdService,
 } from "../services/recommendations.js";
+
+import type { RecommendationType } from "../services/recommendations.js";
+import { RecommendationError } from "../services/recommendations.js";
+
+import { sendSuccess } from "../utils/response.js";
 
 function getUserId(value: unknown): number {
   const userId = Number(value);
@@ -17,16 +23,35 @@ function getUserId(value: unknown): number {
   return userId;
 }
 
+function getRecommendationType(value: unknown): RecommendationType {
+  if (value === undefined) {
+    return "all";
+  }
+
+  if (
+    typeof value !== "string" ||
+    !["movie", "series", "all"].includes(value)
+  ) {
+    throw new RecommendationError(
+      "Tipo de contenido inválido. Utiliza movie, series o all.",
+      400,
+    );
+  }
+
+  return value as RecommendationType;
+}
+
 export const getRecommendations: RequestHandler = async (req, res, next) => {
   try {
     const userId = getUserId(req.user?.sub);
     const recommendations = await getRecommendationsService(userId);
 
-    res.status(200).json({
-      success: true,
-      message: "Recomendaciones obtenidas correctamente",
-      data: recommendations,
-    });
+    sendSuccess(
+      res,
+      200,
+      "Recomendaciones obtenidas correctamente",
+      recommendations,
+    );
   } catch (error) {
     next(error);
   }
@@ -35,13 +60,16 @@ export const getRecommendations: RequestHandler = async (req, res, next) => {
 export const getNextRecommendation: RequestHandler = async (req, res, next) => {
   try {
     const userId = getUserId(req.user?.sub);
-    const recommendation = await getNextRecommendationService(userId);
+    const type = getRecommendationType(req.query.type);
 
-    res.status(201).json({
-      success: true,
-      message: "Nueva recomendación generada correctamente",
-      data: recommendation,
-    });
+    const recommendation = await getNextRecommendationService(userId, type);
+
+    sendSuccess(
+      res,
+      201,
+      "Nueva recomendación generada correctamente",
+      recommendation,
+    );
   } catch (error) {
     next(error);
   }
@@ -50,16 +78,18 @@ export const getNextRecommendation: RequestHandler = async (req, res, next) => {
 export const getRecommendationById: RequestHandler = async (req, res, next) => {
   try {
     const userId = getUserId(req.user?.sub);
+
     const recommendation = await getRecommendationByIdService(
       userId,
       Number(req.params.id),
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Recomendación obtenida correctamente",
-      data: recommendation,
-    });
+    sendSuccess(
+      res,
+      200,
+      "Recomendación obtenida correctamente",
+      recommendation,
+    );
   } catch (error) {
     next(error);
   }

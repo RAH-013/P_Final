@@ -4,13 +4,12 @@ import { fileURLToPath } from "node:url";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
 
+import { env } from "../config/env.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedOrigins = new Set([
-  "http://localhost:8080",
-  "http://127.0.0.1:5500",
-]);
+const allowedOrigins = new Set(env.CORS_ORIGINS);
 
 function corsMiddleware(
   req: express.Request,
@@ -25,7 +24,7 @@ function corsMiddleware(
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader(
       "Access-Control-Allow-Methods",
-      "GET, POST, PATCH, DELETE, OPTIONS",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     );
     res.setHeader(
       "Access-Control-Allow-Headers",
@@ -34,6 +33,11 @@ function corsMiddleware(
   }
 
   if (req.method === "OPTIONS") {
+    if (!origin || !allowedOrigins.has(origin)) {
+      res.sendStatus(403);
+      return;
+    }
+
     res.sendStatus(204);
     return;
   }
@@ -43,10 +47,20 @@ function corsMiddleware(
 
 export function setupMiddlewares(app: Express): void {
   app.use(corsMiddleware);
+
+  console.log(
+    `CORS: ${
+      env.CORS_ORIGINS.includes("*")
+        ? "Todos los dominios permitidos (*)"
+        : env.CORS_ORIGINS.join(", ")
+    }`,
+  );
+
   app.use(logger("dev"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
+
   app.use(
     express.static(path.join(__dirname, "../../public"), {
       index: false,

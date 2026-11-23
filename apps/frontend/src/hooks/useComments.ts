@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import {
   createComment,
@@ -6,6 +6,7 @@ import {
   getAllComments,
   getCommentById,
   getCommentsByMedia,
+  getCommentsByUser,
   updateComment,
 } from "../api/services/comments";
 
@@ -14,93 +15,167 @@ import { useApiRequest } from "./useApiRequest";
 
 export function useComments() {
   const [comments, setComments] = useState<Comment[]>([]);
+  const mediaRequestId = useRef(0);
 
-  const listRequest = useApiRequest(getAllComments);
-  const createRequest = useApiRequest(createComment);
-  const mediaRequest = useApiRequest(getCommentsByMedia);
-  const detailRequest = useApiRequest(getCommentById);
-  const updateRequest = useApiRequest(updateComment);
-  const deleteRequest = useApiRequest(deleteComment);
+  const {
+    execute: executeList,
+    loading: listLoading,
+    error: listError,
+  } = useApiRequest(getAllComments);
 
-  const fetchAllComments = async () => {
-    const response = await listRequest.execute();
-    setComments(response.comments);
+  const {
+    execute: executeCreate,
+    loading: createLoading,
+    error: createError,
+  } = useApiRequest(createComment);
+
+  const {
+    execute: executeMedia,
+    loading: mediaLoading,
+    error: mediaError,
+  } = useApiRequest(getCommentsByMedia);
+
+  const {
+    execute: executeUser,
+    loading: userLoading,
+    error: userError,
+  } = useApiRequest(getCommentsByUser);
+
+  const {
+    execute: executeDetail,
+    loading: detailLoading,
+    error: detailError,
+  } = useApiRequest(getCommentById);
+
+  const {
+    execute: executeUpdate,
+    loading: updateLoading,
+    error: updateError,
+  } = useApiRequest(updateComment);
+
+  const {
+    execute: executeDelete,
+    loading: deleteLoading,
+    error: deleteError,
+  } = useApiRequest(deleteComment);
+
+  const fetchAllComments = useCallback(async () => {
+    const requestId = ++mediaRequestId.current;
+    const response = await executeList();
+
+    if (requestId === mediaRequestId.current) {
+      setComments(response.comments);
+    }
+
     return response.comments;
-  };
+  }, [executeList]);
 
-  const addComment = async (
-    externalId: string,
-    mediaType: MediaType,
-    content: string,
-  ) => {
-    const response = await createRequest.execute({
-      externalId,
-      mediaType,
-      content,
-    });
+  const fetchCommentsByUser = useCallback(
+    async (userId: number) => {
+      const requestId = ++mediaRequestId.current;
+      const response = await executeUser(userId);
 
-    setComments((current) => [
-      response.comment,
-      ...current.filter((comment) => comment.id !== response.comment.id),
-    ]);
+      if (requestId === mediaRequestId.current) {
+        setComments(response.comments);
+      }
 
-    return response;
-  };
+      return response.comments;
+    },
+    [executeUser],
+  );
 
-  const fetchCommentsByMedia = async (
-    mediaType: MediaType,
-    externalId: string,
-  ) => {
-    const response = await mediaRequest.execute(mediaType, externalId);
-    setComments(response.comments);
-    return response.comments;
-  };
+  const fetchCommentsByMedia = useCallback(
+    async (mediaType: MediaType, externalId: string) => {
+      const requestId = ++mediaRequestId.current;
+      const response = await executeMedia(mediaType, externalId);
 
-  const fetchCommentById = async (id: number) => {
-    return detailRequest.execute(id);
-  };
+      if (requestId === mediaRequestId.current) {
+        setComments(response.comments);
+      }
 
-  const editComment = async (id: number, content: string) => {
-    const response = await updateRequest.execute(id, { content });
+      return response.comments;
+    },
+    [executeMedia],
+  );
 
-    setComments((current) =>
-      current.map((comment) =>
-        comment.id === id ? response.comment : comment,
-      ),
-    );
+  const fetchCommentById = useCallback(
+    (id: number) => executeDetail(id),
+    [executeDetail],
+  );
 
-    return response;
-  };
+  const addComment = useCallback(
+    async (externalId: string, mediaType: MediaType, content: string) => {
+      const response = await executeCreate({
+        externalId,
+        mediaType,
+        content,
+      });
 
-  const removeComment = async (id: number) => {
-    const response = await deleteRequest.execute(id);
+      setComments((current) => [
+        response.comment,
+        ...current.filter((comment) => comment.id !== response.comment.id),
+      ]);
 
-    setComments((current) => current.filter((comment) => comment.id !== id));
+      return response;
+    },
+    [executeCreate],
+  );
 
-    return response;
-  };
+  const editComment = useCallback(
+    async (id: number, content: string) => {
+      const response = await executeUpdate(id, { content });
+
+      setComments((current) =>
+        current.map((comment) =>
+          comment.id === id ? response.comment : comment,
+        ),
+      );
+
+      return response;
+    },
+    [executeUpdate],
+  );
+
+  const removeComment = useCallback(
+    async (id: number) => {
+      const response = await executeDelete(id);
+
+      setComments((current) => current.filter((comment) => comment.id !== id));
+
+      return response;
+    },
+    [executeDelete],
+  );
 
   return {
     comments,
     fetchAllComments,
-    addComment,
+    fetchCommentsByUser,
     fetchCommentsByMedia,
     fetchCommentById,
+    addComment,
     editComment,
     removeComment,
+
+    mediaLoading,
+    mediaError,
+
     loading:
-      listRequest.loading ||
-      createRequest.loading ||
-      mediaRequest.loading ||
-      detailRequest.loading ||
-      updateRequest.loading ||
-      deleteRequest.loading,
+      listLoading ||
+      createLoading ||
+      mediaLoading ||
+      userLoading ||
+      detailLoading ||
+      updateLoading ||
+      deleteLoading,
+
     error:
-      listRequest.error ??
-      createRequest.error ??
-      mediaRequest.error ??
-      detailRequest.error ??
-      updateRequest.error ??
-      deleteRequest.error,
+      listError ??
+      createError ??
+      mediaError ??
+      userError ??
+      detailError ??
+      updateError ??
+      deleteError,
   };
 }

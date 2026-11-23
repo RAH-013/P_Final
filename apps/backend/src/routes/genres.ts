@@ -1,9 +1,14 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/auth.js";
-import { getGenres, updateGenres } from "../controllers/genres.js";
+import {
+  getAvailableGenresController,
+  getGenres,
+  updateGenres,
+} from "../controllers/genres.js";
 
 const router = Router();
 
+router.get("/", getAvailableGenresController);
 router.get("/me", requireAuth, getGenres);
 router.put("/me", requireAuth, updateGenres);
 

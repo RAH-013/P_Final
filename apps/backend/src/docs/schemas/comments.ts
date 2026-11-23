@@ -79,6 +79,50 @@
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  *
+ * /api/comments/user/{userId}:
+ *   get:
+ *     tags:
+ *       - Comments
+ *     summary: Obtener comentarios de un usuario
+ *     description: Devuelve todos los comentarios publicados por un usuario específico, incluyendo información básica de su autor y ordenados del más reciente al más antiguo. No requiere autenticación.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: Identificador interno del usuario.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         example: 3
+ *     responses:
+ *       200:
+ *         description: Comentarios del usuario obtenidos correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - comments
+ *               properties:
+ *                 comments:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: ID de usuario inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Usuario no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ *
  * /api/comments/{mediaType}/{externalId}:
  *   get:
  *     tags:

@@ -12,7 +12,7 @@ export default function Main() {
   return (
     <div className="min-h-dvh w-full bg-slate-950 text-white">
       <Header />
-      <main className="" ref={mainRef}>
+      <main className="pb-28" ref={mainRef}>
         <Suspense fallback={<Loader />}>
           <Outlet />
         </Suspense>
