@@ -200,8 +200,12 @@ Nexus utiliza REST para exponer sus funcionalidades, ya que permite integrar fá
 | --------------------------------- | ----------------------------------------------- |
 | Anguiano Hernández Ricardo        | Desarrollador Full-Stack                        |
 | Aviña Martinez Luis Fernando      | [Responsabilidades y componentes desarrollados] |
-| Fajardo Williams Romina Elizabeth | [Responsabilidades y componentes desarrollados] |
+| Fajardo Williams Romina Elizabeth | Diseño de interfaz, apoyo y revisión general del proyecto. |
 
 **Ricardo**: La parte que más me costó fue integrar los diferentes servicios del proyecto y conseguir que funcionaran correctamente en conjunto, principalmente porque cada componente tiene sus propias configuraciones, dependencias y formas de comunicación. Tuve que resolver problemas relacionados con la autenticación, la persistencia de datos, las respuestas de servicios externos y la configuración de Docker Compose. Esto me permitió comprender mejor cómo se relacionan las distintas capas de una aplicación y la importancia de manejar adecuadamente los errores.
 
 Si el proyecto se desarrollara en una empresa, mejoraría principalmente la cobertura de pruebas automatizadas, el monitoreo de los servicios y la gestión de errores. También reforzaría la seguridad de las integraciones externas y establecería procesos de despliegue más controlados. Esto facilitaría el mantenimiento del sistema, permitiría detectar problemas antes de llegar a producción y prepararía la plataforma para crecer sin comprometer su estabilidad.
+
+**Romina:** Una de las partes que más se me complicó durante el proyecto fue comprender cómo se relacionaban los diferentes componentes de Nexus, especialmente la comunicación entre el frontend y el backend, así como algunas funciones del código. Aunque mi participación estuvo más enfocada en el diseño de la interfaz y el apoyo en la revisión del proyecto, también tuve que familiarizarme con su funcionamiento para entender mejor cómo trabajaban los diferentes servicios.
+
+Si el proyecto se desarrollara en una empresa, mejoraría principalmente la organización del trabajo y la documentación, para que cada integrante pudiera comprender más fácilmente las funciones de los demás. También dedicaría más tiempo a realizar pruebas de usabilidad y mejorar la interfaz, buscando que la aplicación fuera más intuitiva y sencilla de utilizar.
