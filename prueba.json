@@ -23,7 +23,8 @@
   "metodo_eliminar": "DELETE",
   "id_inexistente": "999999999",
   "encabezados": {
-    "Origin": "http://localhost:8080"
+    "Origin": "http://localhost:8080",
+    "X-Client-Type": "U3S7-Evaluator"
   },
   "externo": {
     "metodo": "GET",

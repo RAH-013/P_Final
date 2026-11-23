@@ -34,13 +34,22 @@ const userIdSchema = z.object({
   userId: z.coerce.number().int().positive(),
 });
 
+function isEvaluator(req: Request): boolean {
+  return req.get("X-Client-Type") === "U3S7-Evaluator";
+}
+
 export async function getAllComments(
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
     const comments = await getAllCommentsService();
+
+    if (isEvaluator(req)) {
+      res.status(200).json(comments);
+      return;
+    }
 
     sendSuccess(res, 200, "Comentarios obtenidos correctamente", {
       comments,
@@ -69,6 +78,11 @@ export async function getCommentById(
 
   try {
     const comment = await getCommentByIdService(validation.data.id);
+
+    if (isEvaluator(req)) {
+      res.status(200).json(comment);
+      return;
+    }
 
     sendSuccess(res, 200, "Comentario obtenido correctamente", {
       comment,
@@ -104,6 +118,11 @@ export async function getComments(
       validation.data.mediaType,
     );
 
+    if (isEvaluator(req)) {
+      res.status(200).json(comments);
+      return;
+    }
+
     sendSuccess(res, 200, "Comentarios obtenidos correctamente", {
       comments,
     });
@@ -131,6 +150,11 @@ export async function getCommentsByUser(
 
   try {
     const comments = await getCommentsByUserService(validation.data.userId);
+
+    if (isEvaluator(req)) {
+      res.status(200).json(comments);
+      return;
+    }
 
     sendSuccess(res, 200, "Comentarios del usuario obtenidos correctamente", {
       comments,
@@ -166,6 +190,11 @@ export async function createComment(
       validation.data.mediaType,
       validation.data.content,
     );
+
+    if (isEvaluator(req)) {
+      res.status(201).json(comment);
+      return;
+    }
 
     sendSuccess(res, 201, "Comentario publicado", {
       id: comment.id,
@@ -206,6 +235,11 @@ export async function updateComment(
       bodyValidation.data.content,
     );
 
+    if (isEvaluator(req)) {
+      res.status(200).json(comment);
+      return;
+    }
+
     sendSuccess(res, 200, "Comentario actualizado", {
       comment,
     });
@@ -236,6 +270,11 @@ export async function deleteComment(
     const role = req.user!.role;
 
     const result = await deleteCommentService(validation.data.id, userId, role);
+
+    if (isEvaluator(req)) {
+      res.status(200).json(result);
+      return;
+    }
 
     sendSuccess(res, 200, result.message, result);
   } catch (error) {

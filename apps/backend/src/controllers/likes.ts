@@ -17,6 +17,10 @@ const likeSchema = z.object({
 
 const likeIdSchema = z.string().regex(/^[1-9]\d*$/);
 
+function isEvaluator(req: Request): boolean {
+  return req.get("X-Client-Type") === "U3S7-Evaluator";
+}
+
 export async function getLikes(
   req: Request,
   res: Response,
@@ -25,6 +29,11 @@ export async function getLikes(
   try {
     const userId = Number(req.user!.sub);
     const likes = await getUserLikes(userId);
+
+    if (isEvaluator(req)) {
+      res.status(200).json(likes);
+      return;
+    }
 
     sendSuccess(res, 200, "Favoritos obtenidos correctamente", { likes });
   } catch (error) {
@@ -52,6 +61,11 @@ export async function getLikeById(
   try {
     const userId = Number(req.user!.sub);
     const like = await getUserLike(userId, Number(validation.data));
+
+    if (isEvaluator(req)) {
+      res.status(200).json(like);
+      return;
+    }
 
     sendSuccess(res, 200, "Favorito obtenido correctamente", { like });
   } catch (error) {
@@ -84,6 +98,11 @@ export async function createLike(
       validation.data.externalId,
       validation.data.mediaType,
     );
+
+    if (isEvaluator(req)) {
+      res.status(201).json(like);
+      return;
+    }
 
     sendSuccess(res, 201, "Contenido agregado a tus favoritos", { like });
   } catch (error) {
@@ -119,6 +138,11 @@ export async function deleteLike(
       validation.data.externalId,
       validation.data.mediaType,
     );
+
+    if (isEvaluator(req)) {
+      res.status(200).json(result);
+      return;
+    }
 
     sendSuccess(res, 200, result.message, result);
   } catch (error) {

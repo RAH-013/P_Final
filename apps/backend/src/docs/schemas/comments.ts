@@ -12,14 +12,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - comments
- *               properties:
- *                 comments:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/CommentsResponse'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  *
@@ -46,20 +39,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - id
- *                 - message
- *                 - comment
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 12
- *                 message:
- *                   type: string
- *                   example: Comentario publicado
- *                 comment:
- *                   $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/CreateCommentResponse'
  *       400:
  *         description: Datos inválidos o comentario vacío
  *         content:
@@ -76,6 +56,10 @@
  *               $ref: '#/components/schemas/ErrorResponse'
  *       502:
  *         description: Error al consultar el catálogo externo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  *
@@ -84,7 +68,7 @@
  *     tags:
  *       - Comments
  *     summary: Obtener comentarios de un usuario
- *     description: Devuelve todos los comentarios publicados por un usuario específico, incluyendo información básica de su autor y ordenados del más reciente al más antiguo. No requiere autenticación.
+ *     description: Devuelve los comentarios publicados por un usuario específico, ordenados del más reciente al más antiguo. No requiere autenticación.
  *     parameters:
  *       - in: path
  *         name: userId
@@ -100,14 +84,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - comments
- *               properties:
- *                 comments:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/CommentsResponse'
  *       400:
  *         description: ID de usuario inválido
  *         content:
@@ -154,14 +131,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - comments
- *               properties:
- *                 comments:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/CommentsResponse'
  *       400:
  *         description: Tipo o identificador de contenido inválido
  *         content:
@@ -192,12 +162,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - comment
- *               properties:
- *                 comment:
- *                   $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/CommentResponse'
  *       400:
  *         description: ID de comentario inválido
  *         content:
@@ -243,16 +208,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - message
- *                 - comment
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Comentario actualizado
- *                 comment:
- *                   $ref: '#/components/schemas/Comment'
+ *               $ref: '#/components/schemas/UpdateCommentResponse'
  *       400:
  *         description: ID o contenido inválido
  *         content:
@@ -298,13 +254,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - message
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Comentario eliminado
+ *               $ref: '#/components/schemas/MessageResponse'
  *       400:
  *         description: ID de comentario inválido
  *         content:
@@ -330,6 +280,113 @@
  *
  * components:
  *   schemas:
+ *     CommentsResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Comentarios obtenidos correctamente
+ *         data:
+ *           type: object
+ *           required:
+ *             - comments
+ *           properties:
+ *             comments:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *
+ *     CommentResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Comentario obtenido correctamente
+ *         data:
+ *           type: object
+ *           required:
+ *             - comment
+ *           properties:
+ *             comment:
+ *               $ref: '#/components/schemas/Comment'
+ *
+ *     CreateCommentResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Comentario publicado
+ *         data:
+ *           type: object
+ *           required:
+ *             - id
+ *             - comment
+ *           properties:
+ *             id:
+ *               type: integer
+ *               example: 12
+ *             comment:
+ *               $ref: '#/components/schemas/Comment'
+ *
+ *     UpdateCommentResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Comentario actualizado
+ *         data:
+ *           type: object
+ *           required:
+ *             - comment
+ *           properties:
+ *             comment:
+ *               $ref: '#/components/schemas/Comment'
+ *
+ *     MessageResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Comentario eliminado
+ *         data:
+ *           type: object
+ *           additionalProperties: true
+ *
  *     CreateCommentRequest:
  *       type: object
  *       additionalProperties: false

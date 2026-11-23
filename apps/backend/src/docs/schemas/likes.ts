@@ -5,7 +5,7 @@
  *     tags:
  *       - Likes
  *     summary: Obtener los favoritos del usuario autenticado
- *     description: Devuelve las películas y series que pertenecen al usuario autenticado, ordenadas por fecha de creación descendente.
+ *     description: Devuelve las películas y series favoritas del usuario autenticado, ordenadas por fecha de creación descendente.
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -14,18 +14,11 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - likes
- *               properties:
- *                 likes:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Like'
- *       400:
- *         description: El ID del usuario no es válido
+ *               $ref: '#/components/schemas/LikesResponse'
  *       401:
  *         description: No autenticado o sesión inválida
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  *
  *   post:
  *     tags:
@@ -39,45 +32,45 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - externalId
- *               - mediaType
- *             properties:
- *               externalId:
- *                 type: string
- *                 pattern: '^tt\d+$'
- *                 example: tt0111161
- *               mediaType:
- *                 type: string
- *                 enum:
- *                   - movie
- *                   - series
- *                 example: movie
+ *             $ref: '#/components/schemas/CreateLikeRequest'
+ *           example:
+ *             externalId: tt0111161
+ *             mediaType: movie
  *     responses:
  *       201:
  *         description: Favorito creado o favorito existente devuelto correctamente
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - message
- *                 - like
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Contenido agregado a tus favoritos
- *                 like:
- *                   $ref: '#/components/schemas/Like'
+ *               $ref: '#/components/schemas/LikeResponse'
  *       400:
- *         description: Datos del favorito o ID del usuario inválidos
+ *         description: Datos del favorito inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: No autenticado o sesión inválida
  *       404:
  *         description: Usuario o película/serie no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       409:
  *         description: Conflicto por registro duplicado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       502:
+ *         description: Error al consultar el catálogo externo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  *
  * /api/likes/{id}:
  *   get:
@@ -91,7 +84,7 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID numérico del favorito
+ *         description: Identificador interno del favorito.
  *         schema:
  *           type: integer
  *           minimum: 1
@@ -102,18 +95,23 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - like
- *               properties:
- *                 like:
- *                   $ref: '#/components/schemas/Like'
+ *               $ref: '#/components/schemas/LikeResponse'
  *       400:
  *         description: ID del favorito inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: No autenticado o sesión inválida
  *       404:
  *         description: Favorito no encontrado o no pertenece al usuario autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  *
  * /api/likes/{mediaType}/{externalId}:
  *   delete:
@@ -146,22 +144,88 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               required:
- *                 - message
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Contenido eliminado de tus favoritos
+ *               $ref: '#/components/schemas/MessageResponse'
  *       400:
  *         description: Parámetros inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: No autenticado o sesión inválida
  *       404:
- *         description: Usuario o contenido no encontrado en favoritos
+ *         description: Contenido no encontrado en favoritos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  *
  * components:
  *   schemas:
+ *     LikesResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Favoritos obtenidos correctamente
+ *         data:
+ *           type: object
+ *           required:
+ *             - likes
+ *           properties:
+ *             likes:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Like'
+ *
+ *     LikeResponse:
+ *       type: object
+ *       required:
+ *         - success
+ *         - message
+ *         - data
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: Contenido agregado a tus favoritos
+ *         data:
+ *           type: object
+ *           required:
+ *             - like
+ *           properties:
+ *             like:
+ *               $ref: '#/components/schemas/Like'
+ *
+ *     CreateLikeRequest:
+ *       type: object
+ *       additionalProperties: false
+ *       required:
+ *         - externalId
+ *         - mediaType
+ *       properties:
+ *         externalId:
+ *           type: string
+ *           pattern: '^tt\d+$'
+ *           example: tt0111161
+ *         mediaType:
+ *           type: string
+ *           enum:
+ *             - movie
+ *             - series
+ *           example: movie
+ *
  *     Like:
  *       type: object
  *       required:
@@ -175,6 +239,7 @@
  *           example: 5
  *         externalId:
  *           type: string
+ *           pattern: '^tt\d+$'
  *           example: tt0111161
  *         mediaType:
  *           type: string
