@@ -199,7 +199,7 @@ Nexus utiliza REST para exponer sus funcionalidades, ya que permite integrar fá
 | Integrante                        | Qué hizo                                        |
 | --------------------------------- | ----------------------------------------------- |
 | Anguiano Hernández Ricardo        | Desarrollador Full-Stack                        |
-| Aviña Martinez Luis Fernando      | [Responsabilidades y componentes desarrollados] |
+| Aviña Martinez Luis Fernando      | Desarrollador Full-Stack                        |
 | Fajardo Williams Romina Elizabeth | Diseño de interfaz, apoyo y revisión general del proyecto. |
 
 **Ricardo**: La parte que más me costó fue integrar los diferentes servicios del proyecto y conseguir que funcionaran correctamente en conjunto, principalmente porque cada componente tiene sus propias configuraciones, dependencias y formas de comunicación. Tuve que resolver problemas relacionados con la autenticación, la persistencia de datos, las respuestas de servicios externos y la configuración de Docker Compose. Esto me permitió comprender mejor cómo se relacionan las distintas capas de una aplicación y la importancia de manejar adecuadamente los errores.
@@ -209,3 +209,7 @@ Si el proyecto se desarrollara en una empresa, mejoraría principalmente la cobe
 **Romina:** Una de las partes que más se me complicó durante el proyecto fue comprender cómo se relacionaban los diferentes componentes de Nexus, especialmente la comunicación entre el frontend y el backend, así como algunas funciones del código. Aunque mi participación estuvo más enfocada en el diseño de la interfaz y el apoyo en la revisión del proyecto, también tuve que familiarizarme con su funcionamiento para entender mejor cómo trabajaban los diferentes servicios.
 
 Si el proyecto se desarrollara en una empresa, mejoraría principalmente la organización del trabajo y la documentación, para que cada integrante pudiera comprender más fácilmente las funciones de los demás. También dedicaría más tiempo a realizar pruebas de usabilidad y mejorar la interfaz, buscando que la aplicación fuera más intuitiva y sencilla de utilizar.
+
+**Fernando:** Una de las partes que más complicaicon tuvo fue relacionar cómo los componentes del proyecto logran convivir correctamente en conjunto. Esto implicó entender mejor la comunicación entre el frontend y el backend y resolver problemas que surgieron durante la integración de el servicio de inteligencia artificial.
+
+Si el proyecto se desarrollara en una empresa, considero que sería importante mejorar la organización del trabajo, la documentación y la comunicación entre los integrantes del equipo, de manera que todos pudieran comprender mejor las funciones y responsabilidades de los demás, una especia de contrato entre el equipo. También reforzaría las pruebas y el manejo de errores para garantizar un funcionamiento más estable.
